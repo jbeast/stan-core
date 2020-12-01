@@ -143,4 +143,9 @@ public class EntityFactory {
         }
         return new OperationType(++idCounter, name, flagbits);
     }
+
+    public static Tissue makeTissue(Donor donor, SpatialLocation sl) {
+        int id = ++idCounter;
+        return new Tissue(id, "TISSUE "+id, id%7, sl, donor, getMouldSize(), getMedium(), getFixative(), getHmdmc());
+    }
 }

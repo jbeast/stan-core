@@ -35,6 +35,12 @@ public class PlanOperation {
 
     public PlanOperation() {}
 
+    public PlanOperation(Integer id, OperationType opType, User user) {
+        this.id = id;
+        this.operationType = opType;
+        this.user = user;
+    }
+
     public Integer getId() {
         return this.id;
     }
