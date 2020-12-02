@@ -77,6 +77,7 @@ public class GraphQLProvider {
                         .dataFetcher("logout", graphQLMutation.logOut())
                         .dataFetcher("register", transact(graphQLMutation.register()))
                         .dataFetcher("plan", transact(graphQLMutation.recordPlan()))
+                        .dataFetcher("printLabware", graphQLMutation.printLabware()) // not transacted
                 )
                 .build();
     }

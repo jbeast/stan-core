@@ -182,4 +182,5 @@ type Mutation {
     logout: String,
     register(request: RegisterRequest!): RegisterResult!,
     plan(request: PlanRequest!): PlanResult!,
+    printLabware(printerName: String!, barcodes: [String!]!): String,
 }

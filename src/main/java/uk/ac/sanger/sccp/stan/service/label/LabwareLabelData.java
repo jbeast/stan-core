@@ -2,8 +2,7 @@ package uk.ac.sanger.sccp.stan.service.label;
 
 import com.google.common.base.MoreObjects;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * A collection of information that may be printed onto a labware label.
@@ -48,15 +47,38 @@ public class LabwareLabelData {
                 .toString();
     }
 
+    public Map<String, String> getFields() {
+        HashMap<String, String> fields = new HashMap<>();
+        fields.put("barcode", getBarcode());
+        int index = 0;
+        for (LabelContent content : contents) {
+            addField(fields, "donor", index, content.getDonorName());
+            addField(fields, "tissue", index, content.getTissueDesc());
+            if (content.getReplicate()!=null) {
+                addField(fields, "replicate", index, "R:"+content.getReplicate());
+            }
+            if (content.getSection()!=null) {
+                addField(fields, "section", index, String.format("S%03d", content.getSection()));
+            }
+        }
+        return fields;
+    }
+
+    private void addField(Map<String, String> map, String fieldName, int index, String value) {
+        if (value!=null && !value.isEmpty()) {
+            map.put(fieldName+"["+index+"]", value);
+        }
+    }
+
     public static class LabelContent {
         private final String donorName;
-        private final String blockDesc;
+        private final String tissueDesc;
         private final Integer replicate;
         private final Integer section;
 
-        public LabelContent(String donorName, String blockDesc, Integer replicate, Integer section) {
+        public LabelContent(String donorName, String tissueDesc, Integer replicate, Integer section) {
             this.donorName = donorName;
-            this.blockDesc = blockDesc;
+            this.tissueDesc = tissueDesc;
             this.replicate = replicate;
             this.section = section;
         }
@@ -65,8 +87,8 @@ public class LabwareLabelData {
             return this.donorName;
         }
 
-        public String getBlockDesc() {
-            return this.blockDesc;
+        public String getTissueDesc() {
+            return this.tissueDesc;
         }
 
         public Integer getReplicate() {
@@ -83,21 +105,21 @@ public class LabwareLabelData {
             if (o == null || getClass() != o.getClass()) return false;
             LabelContent that = (LabelContent) o;
             return (Objects.equals(this.donorName, that.donorName)
-                    && Objects.equals(this.blockDesc, that.blockDesc)
+                    && Objects.equals(this.tissueDesc, that.tissueDesc)
                     && Objects.equals(this.replicate, that.replicate)
                     && Objects.equals(this.section, that.section));
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(donorName, blockDesc, replicate, section);
+            return Objects.hash(donorName, tissueDesc, replicate, section);
         }
 
         @Override
         public String toString() {
             return MoreObjects.toStringHelper(this)
                     .add("donorName", donorName)
-                    .add("blockDesc", blockDesc)
+                    .add("tissueDesc", tissueDesc)
                     .add("replicate", replicate)
                     .add("section", section)
                     .toString();
