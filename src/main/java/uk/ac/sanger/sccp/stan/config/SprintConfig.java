@@ -34,7 +34,7 @@ public class SprintConfig {
         return this.host;
     }
 
-    public StringTemplate getTemplate(String templateName, int size) throws IOException {
+    public StringTemplate getTemplate(String templateName, int size) {
         templateName = templateName.toLowerCase();
         Map<Integer, StringTemplate> sizeTemplates = templates.get(templateName);
         if (sizeTemplates==null) {

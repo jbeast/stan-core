@@ -26,10 +26,12 @@ public class SprintClient extends BaseHttpClient implements PrintClient<LabelPri
     Logger log = LoggerFactory.getLogger(SprintClient.class);
 
     private final SprintConfig config;
+    private final ObjectMapper objectMapper;
 
     @Autowired
     public SprintClient(SprintConfig config) {
         this.config = config;
+        this.objectMapper = new ObjectMapper();
     }
 
     @Override
@@ -39,8 +41,7 @@ public class SprintClient extends BaseHttpClient implements PrintClient<LabelPri
         checkResult(result);
     }
 
-    private JsonNode toJson(String printerName, LabelPrintRequest request) throws IOException {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public JsonNode toJson(String printerName, LabelPrintRequest request) throws IOException {
         String labelTypeName = request.getLabelType().getName();
         ObjectNode variables = objectMapper.createObjectNode();
         variables.put("printer", printerName);
@@ -58,6 +59,11 @@ public class SprintClient extends BaseHttpClient implements PrintClient<LabelPri
         printMutation.put("query", getQueryText());
         printMutation.set("variables", variables);
         return printMutation;
+    }
+
+    // expose for mockery
+    protected <T> T postJson(URL url, Object data, Class<T> jsonReturnType) throws IOException {
+        return super.postJson(url, data, jsonReturnType);
     }
 
     private String getQueryText() {

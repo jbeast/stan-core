@@ -15,14 +15,10 @@ public class PrintClientFactory {
         this.sprintClient = sprintClient;
     }
 
-    @SuppressWarnings("SwitchStatementWithTooFewBranches")
     public PrintClient<LabelPrintRequest> getClient(Printer.Service service) {
-        switch (service) {
-            case sprint:
-                return sprintClient;
-
-            default:
-                throw new IllegalArgumentException("Unsupported printer service: "+service);
+        if (service == Printer.Service.sprint) {
+            return sprintClient;
         }
+        throw new IllegalArgumentException("Unsupported printer service: "+service);
     }
 }

@@ -53,9 +53,6 @@ public class LabelPrintService {
             throw new IllegalArgumentException("No labware supplied to print.");
         }
         Printer printer = printerRepo.getByName(printerName);
-        List<LabwareLabelData> labelData = labware.stream()
-                .map(labwareLabelDataService::getLabelData)
-                .collect(toList());
         Set<LabelType> labelTypes = labware.stream()
                 .map(lw -> lw.getLabwareType().getLabelType())
                 .collect(toSet());
@@ -66,6 +63,9 @@ public class LabelPrintService {
             throw new IllegalArgumentException("Cannot perform a print request incorporating multiple different label types.");
         }
         LabelType labelType = labelTypes.iterator().next();
+        List<LabwareLabelData> labelData = labware.stream()
+                .map(labwareLabelDataService::getLabelData)
+                .collect(toList());
         LabelPrintRequest request = new LabelPrintRequest(labelType, labelData);
         print(printer, request);
         recordPrint(printer, user, labware);

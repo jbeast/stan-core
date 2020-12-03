@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
  * Tests {@link LabwareLabelDataService}
  * @author dr6
  */
-public class LabwareLabelDataServiceTest {
+public class TestLabwareLabelDataService {
     private PlanActionRepo mockPlanActionRepo;
     private LabwareLabelDataService service;
 

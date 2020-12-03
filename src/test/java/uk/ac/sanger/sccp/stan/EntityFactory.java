@@ -25,6 +25,7 @@ public class EntityFactory {
     private static MouldSize mouldSize;
     private static Medium medium;
     private static Fixative fixative;
+    private static Printer printer;
     private static int idCounter = 10_000;
 
     public static User getUser() {
@@ -125,6 +126,14 @@ public class EntityFactory {
             tube = new Labware(lwId, "STAN-00"+lwId, getTubeType(), new ArrayList<>(List.of(slot)));
         }
         return tube;
+    }
+
+    public static Printer getPrinter() {
+        if (printer==null) {
+            int id = ++idCounter;
+            printer = new Printer(id, "printer"+id, getLabelType(), Printer.Service.sprint);
+        }
+        return printer;
     }
 
     public static Labware makeEmptyLabware(LabwareType lt) {
