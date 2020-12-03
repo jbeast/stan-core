@@ -65,7 +65,7 @@ public abstract class BaseHttpClient {
             //noinspection unchecked
             return (T) string;
         }
-        return objectMapper.convertValue(string, returnType);
+        return objectMapper.readValue(string, returnType);
     }
 
     /**

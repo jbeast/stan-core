@@ -99,7 +99,7 @@ public class GraphQLMutation {
     public DataFetcher<String> printLabware() {
         return dfe -> {
             User user = checkUser();
-            List<String> barcodes = dfe.getArgument("barcodes");// arg(dfe, "barcodes", new TypeReference<>() {});
+            List<String> barcodes = dfe.getArgument("barcodes");
             String printerName = dfe.getArgument("printer");
             labelPrintService.printLabwareBarcodes(user, printerName, barcodes);
             return "OK";

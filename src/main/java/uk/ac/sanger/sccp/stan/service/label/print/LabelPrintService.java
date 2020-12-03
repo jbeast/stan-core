@@ -3,9 +3,10 @@ package uk.ac.sanger.sccp.stan.service.label.print;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.ac.sanger.sccp.stan.model.*;
-import uk.ac.sanger.sccp.stan.repo.LabwareRepo;
+import uk.ac.sanger.sccp.stan.repo.*;
 import uk.ac.sanger.sccp.stan.service.label.*;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 import java.io.IOException;
 import java.util.List;
@@ -15,20 +16,28 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
+ * Service to perform and record labware label printing
  * @author dr6
  */
 @Service
 public class LabelPrintService {
     private final LabwareLabelDataService labwareLabelDataService;
-    private final SprintClient sprintClient;
+    private final PrintClientFactory printClientFactory;
     private final LabwareRepo labwareRepo;
+    private final PrinterRepo printerRepo;
+    private final LabwarePrintRepo labwarePrintRepo;
+    private final LabelTypeRepo labelTypeRepo;
 
     @Autowired
-    public LabelPrintService(LabwareLabelDataService labwareLabelDataService, SprintClient sprintClient,
-                             LabwareRepo labwareRepo) {
+    public LabelPrintService(LabwareLabelDataService labwareLabelDataService, PrintClientFactory printClientFactory,
+                             LabwareRepo labwareRepo, PrinterRepo printerRepo, LabwarePrintRepo labwarePrintRepo,
+                             LabelTypeRepo labelTypeRepo) {
         this.labwareLabelDataService = labwareLabelDataService;
-        this.sprintClient = sprintClient;
+        this.printClientFactory = printClientFactory;
         this.labwareRepo = labwareRepo;
+        this.printerRepo = printerRepo;
+        this.labwarePrintRepo = labwarePrintRepo;
+        this.labelTypeRepo = labelTypeRepo;
     }
 
     public void printLabwareBarcodes(User user, String printerName, List<String> barcodes) throws IOException {
@@ -43,6 +52,7 @@ public class LabelPrintService {
         if (labware.isEmpty()) {
             throw new IllegalArgumentException("No labware supplied to print.");
         }
+        Printer printer = printerRepo.getByName(printerName);
         List<LabwareLabelData> labelData = labware.stream()
                 .map(labwareLabelDataService::getLabelData)
                 .collect(toList());
@@ -57,16 +67,35 @@ public class LabelPrintService {
         }
         LabelType labelType = labelTypes.iterator().next();
         LabelPrintRequest request = new LabelPrintRequest(labelType, labelData);
-        print(printerName, request);
-        recordPrint(user, labware);
+        print(printer, request);
+        recordPrint(printer, user, labware);
     }
 
-    public void print(String printerName, LabelPrintRequest request) throws IOException {
-        sprintClient.print(printerName, request);
+    public void print(Printer printer, LabelPrintRequest request) throws IOException {
+        PrintClient<? super LabelPrintRequest> printClient = printClientFactory.getClient(printer.getService());
+        printClient.print(printer.getName(), request);
     }
 
     @Transactional
-    public void recordPrint(User user, List<Labware> labware) {
-        // TODO
+    public Iterable<LabwarePrint> recordPrint(final Printer printer, final User user, final List<Labware> labware) {
+        List<LabwarePrint> labwarePrints = labware.stream()
+                .map(lw -> new LabwarePrint(printer, lw, user))
+                .collect(toList());
+        return labwarePrintRepo.saveAll(labwarePrints);
+    }
+
+    /**
+     * Finds all matching printers. Either all printers with the indicated label type (if one is specified),
+     * or all printers.
+     * @param labelTypeName the name of a label type (or null to get all printers)
+     * @return matching printers
+     * @exception EntityNotFoundException an invalid label type name is given
+     */
+    public Iterable<Printer> findPrinters(String labelTypeName) {
+        if (labelTypeName==null) {
+            return printerRepo.findAll();
+        }
+        LabelType labelType = labelTypeRepo.getByName(labelTypeName);
+        return printerRepo.findAllByLabelType(labelType);
     }
 }
