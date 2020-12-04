@@ -70,11 +70,11 @@ public class TestLabelPrintService {
     public void testPrintLabwareSuccessful() throws IOException {
         when(mockPrinterRepo.getByName(printer.getName())).thenReturn(printer);
         List<LabwareLabelData> labelData = List.of(
-                new LabwareLabelData(labware.get(0).getBarcode(), List.of(
+                new LabwareLabelData(labware.get(0).getBarcode(), "None", List.of(
                         new LabelContent("DONOR1", "TISSUE1", 2, 3),
                         new LabelContent("DONOR2", "TISSUE2", 3, 4)
                 )),
-                new LabwareLabelData(labware.get(1).getBarcode(), List.of(
+                new LabwareLabelData(labware.get(1).getBarcode(), "None", List.of(
                         new LabelContent("DONOR3", "TISSUE3", 4, null)
                 ))
         );

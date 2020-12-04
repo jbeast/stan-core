@@ -6,10 +6,10 @@ import uk.ac.sanger.sccp.stan.model.*;
 import uk.ac.sanger.sccp.stan.repo.PlanActionRepo;
 import uk.ac.sanger.sccp.stan.service.label.LabwareLabelData.LabelContent;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * @author dr6
@@ -28,10 +28,21 @@ public class LabwareLabelDataService {
                 .flatMap(slot -> slot.getSamples().stream())
                 .map(this::getContent)
                 .collect(toList());
+        Set<String> mediums = labware.getSlots().stream()
+                .flatMap(slot -> slot.getSamples().stream())
+                .map(sample -> sample.getTissue().getMedium().getName())
+                .collect(toSet());
         if (content.isEmpty()) {
-            content = getPlannedContent(labware);
+            List<PlanAction> planActions = planActionRepo.findAllByDestinationLabwareId(labware.getId());
+            if (!planActions.isEmpty()) {
+                mediums = planActions.stream()
+                        .map(pa -> pa.getSample().getTissue().getMedium().getName())
+                        .collect(toSet());
+                content = getPlannedContent(planActions);
+            }
         }
-        return new LabwareLabelData(labware.getBarcode(), content);
+        String medium = (mediums.size()==1 ? mediums.iterator().next() : null);
+        return new LabwareLabelData(labware.getBarcode(), medium, content);
     }
 
     public LabelContent getContent(Sample sample) {
@@ -53,8 +64,7 @@ public class LabwareLabelDataService {
         }
     }
 
-    public List<LabelContent> getPlannedContent(Labware labware) {
-        List<PlanAction> planActions = planActionRepo.findAllByDestinationLabwareId(labware.getId());
+    public List<LabelContent> getPlannedContent(List<PlanAction> planActions) {
         return planActions.stream()
                 .sorted(Comparator.comparing((PlanAction ac) -> ac.getDestination().getAddress())
                         .thenComparing(PlanAction::getId))

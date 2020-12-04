@@ -47,12 +47,12 @@ public class TestLabwareLabelDataService {
                 .map(sam -> new LabelContent(sam.getTissue().getDonor().getDonorName(),
                         tissueString(sam.getTissue()), sam.getTissue().getReplicate(), sam.getSection()))
                 .collect(toList());
-        LabwareLabelData expected = new LabwareLabelData(lw.getBarcode(), expectedContents);
+        LabwareLabelData expected = new LabwareLabelData(lw.getBarcode(), tissue.getMedium().getName(), expectedContents);
         assertEquals(expected, actual);
 
         Labware emptyLabware = EntityFactory.makeEmptyLabware(EntityFactory.getTubeType());
         when(mockPlanActionRepo.findAllByDestinationLabwareId(emptyLabware.getId())).thenReturn(List.of());
-        assertEquals(new LabwareLabelData(emptyLabware.getBarcode(), List.of()), service.getLabelData(emptyLabware));
+        assertEquals(new LabwareLabelData(emptyLabware.getBarcode(), null, List.of()), service.getLabelData(emptyLabware));
     }
 
     @Test
@@ -87,7 +87,7 @@ public class TestLabwareLabelDataService {
                 new LabelContent(donor2.getDonorName(), tissueString(tissue2), tissue2.getReplicate(), 5),
                 new LabelContent(donor2.getDonorName(), tissueString(tissue2), tissue2.getReplicate(), 14)
         );
-        assertEquals(new LabwareLabelData(labware.getBarcode(), expectedContents), actual);
+        assertEquals(new LabwareLabelData(labware.getBarcode(), tissue1.getMedium().getName(), expectedContents), actual);
     }
 
     @ParameterizedTest

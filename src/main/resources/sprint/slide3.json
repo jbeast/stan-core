@@ -1,8 +1,8 @@
 {
   "labelSize": {
-    "width": 28,
-    "height": 9,
-    "displacement": 12
+    "width": 23,
+    "height": 19,
+    "displacement": 22
   },
   "barcodeFields": [
     {
@@ -19,6 +19,12 @@
       "fontSize": 2.2,
       "x": 1,
       "y": 4
+    },
+    {
+      "value": "#medium#",
+      "fontSize": 1.8,
+      "x": 8,
+      "y": 6
     },
     {
       "value": "#donor[0]#",
