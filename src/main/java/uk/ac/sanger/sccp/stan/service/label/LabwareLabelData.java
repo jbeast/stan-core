@@ -69,6 +69,7 @@ public class LabwareLabelData {
             if (content.getSection()!=null) {
                 addField(fields, "section", index, String.format("S%03d", content.getSection()));
             }
+            ++index;
         }
         return fields;
     }
