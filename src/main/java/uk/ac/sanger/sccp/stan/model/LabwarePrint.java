@@ -1,6 +1,8 @@
 package uk.ac.sanger.sccp.stan.model;
 
 import com.google.common.base.MoreObjects;
+import org.hibernate.annotations.Generated;
+import org.hibernate.annotations.GenerationTime;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -21,7 +23,7 @@ public class LabwarePrint {
     private Labware labware;
     @ManyToOne
     private User user;
-
+    @Generated(GenerationTime.INSERT)
     private Timestamp printed;
 
     public LabwarePrint() {}

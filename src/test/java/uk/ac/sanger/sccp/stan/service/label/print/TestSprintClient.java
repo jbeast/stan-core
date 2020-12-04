@@ -47,7 +47,7 @@ public class TestSprintClient {
         );
         StringTemplate template = new StringTemplate("{\"barcode\":\"#barcode#\", " +
                 "\"contents\":[\"#donor[0]#\", \"#tissue[0]#\", \"#replicate[0]#\", \"#section[0]#\"," +
-                "\"#donor[0]#\", \"#tissue[0]#\", \"#replicate[0]#\", \"#section[0]#\"]}", "#", "#");
+                "\"#donor[1]#\", \"#tissue[1]#\", \"#replicate[1]#\", \"#section[1]#\"]}", "#", "#");
         when(mockSprintConfig.getTemplate(eq(labelType.getName()), anyInt())).thenReturn(template);
 
         JsonNode result = sprintClient.toJson("printer1", request);
@@ -55,9 +55,9 @@ public class TestSprintClient {
                 "{  print(printer: $printer, printRequest: $printRequest) {    jobId  }}\"," +
                 "\"variables\":{\"printer\":\"printer1\"," +
                 "\"printRequest\":{\"layouts\":[{\"barcode\":\"STAN-1\"," +
-                "\"contents\":[\"DONOR2\",\"TISSUE2\",\"R:3\",\"S004\",\"DONOR2\",\"TISSUE2\",\"R:3\",\"S004\"]}," +
+                "\"contents\":[\"DONOR1\",\"TISSUE1\",\"R:1\",\"S002\",\"DONOR2\",\"TISSUE2\",\"R:3\",\"S004\"]}," +
                 "{\"barcode\":\"STAN-2\"," +
-                "\"contents\":[\"DONOR3\",\"TISSUE3\",\"R:5\",\"\",\"DONOR3\",\"TISSUE3\",\"R:5\",\"\"]}]}}}";
+                "\"contents\":[\"DONOR3\",\"TISSUE3\",\"R:5\",\"\",\"\",\"\",\"\",\"\"]}]}}}";
 
         assertEquals(expected, result.toString());
     }

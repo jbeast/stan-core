@@ -49,6 +49,9 @@ public class EntityCreator {
     @Autowired
     private LabelTypeRepo labelTypeRepo;
     @Autowired
+    private PrinterRepo printerRepo;
+
+    @Autowired
     private EntityManager entityManager;
 
     public User createUser(String username) {
@@ -122,6 +125,15 @@ public class EntityCreator {
         planActionRepo.saveAll(planActions);
         entityManager.refresh(plan);
         return plan;
+    }
+
+    public Printer createPrinter(String name, LabelType labelType) {
+        Printer printer = new Printer(null, name, labelType, Printer.Service.sprint);
+        return printerRepo.save(printer);
+    }
+
+    public Printer createPrinter(String name) {
+        return createPrinter(name, getAny(labelTypeRepo));
     }
 
     public <E> E getAny(CrudRepository<E, ?> repo) {
